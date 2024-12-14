@@ -5,6 +5,7 @@ import com.stocksafe.dto.ClientDTO;
 import com.stocksafe.services.ClientService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/client")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ClientController {
 
     private final ClientService clientService;
