@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -19,18 +20,19 @@ public class ClientController {
     private final ClientService clientService;
 
     @PostMapping
-    public ResponseEntity<ClientDTO> cadastrarCliente(@RequestBody ClientDTO clientDTO) {
-        return clientService.cadastrar(dto);
+    public ResponseEntity<ClientDTO> cadastrarCliente(@RequestBody ClientDTO dto) {
+
+       return ResponseEntity.ok(clientService.cadastrar(dto));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ClientDTO> buscar(@PathVariable Long id) {
 
-        return clientService.buscar(id);
+        return ResponseEntity.ok(clientService.buscar(id));
     }
 
     @GetMapping
     public ResponseEntity<List<ClientDTO>> listar() {
-        return clientService.list();
+        return ResponseEntity.ok(clientService.list());
     }
 }
