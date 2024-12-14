@@ -2,6 +2,7 @@ package com.stocksafe.model;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.stocksafe.model.enums.BoxStatus;
 import com.stocksafe.model.enums.BoxType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,6 +44,8 @@ public class Box {
     @OneToOne
     @JoinColumn(name = "client_id")
     private Client client;
+
+    private BoxStatus status = BoxStatus.ENABLED;
 
     @PrePersist
     public void prePersist() {

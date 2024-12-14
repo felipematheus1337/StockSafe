@@ -6,13 +6,19 @@ import com.stocksafe.model.Box;
 import com.stocksafe.model.Client;
 import com.stocksafe.model.Item;
 import com.stocksafe.model.enums.BoxCapacityStatus;
+import com.stocksafe.model.enums.BoxStatus;
 import com.stocksafe.repositories.BoxRepository;
 import com.stocksafe.repositories.ClientRepository;
 import com.stocksafe.repositories.ItemRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,6 +56,7 @@ public class BusinessService {
         if (status != BoxCapacityStatus.VALID)
             throw new IllegalStateException(status.getMessage());
 
+
         List<Item> items = itemDTOs.stream()
                 .map(itemDTO -> {
                     Item item = this.itemMapper.toModel(itemDTO);
@@ -73,6 +80,7 @@ public class BusinessService {
         int actualWeight = box.getWeight();
 
         if (actualWeight >= boxMaximumCapacity) {
+            box.setStatus(BoxStatus.FULL);
             return BoxCapacityStatus.OVER_CAPACITY;
         }
 
@@ -82,9 +90,37 @@ public class BusinessService {
             return BoxCapacityStatus.EXCEEDS_REMAINING;
         }
 
+        box.setStatus(BoxStatus.ENABLED);
         return BoxCapacityStatus.VALID;
 
 
 
     }
+
+    @Async
+    @Transactional
+    public void verify() {
+
+        Pageable pageable = PageRequest.of(0, 1000);
+        Page<Box> page;
+
+        do {
+
+            page = this.boxRepository.findAll(pageable);
+            page.getContent().forEach(b -> {
+
+                LocalDateTime dataFinal = b.getPeriodoFinal();
+                LocalDateTime dataAtual = LocalDateTime.now();
+
+                if (dataFinal != null && dataAtual.isAfter(dataFinal)) {
+                    b.setStatus(BoxStatus.DISABLED);
+                }
+            });
+            this.boxRepository.saveAll(page.getContent());
+            pageable = pageable.next();
+
+        } while(page.hasNext());
+    }
+
+
 }

@@ -11,9 +11,9 @@ CREATE TABLE IF NOT EXISTS box (
     CONSTRAINT fk_client FOREIGN KEY (client_id) REFERENCES client(id)
 );
 
-INSERT INTO box (max_weight, box_type)
+INSERT INTO box (max_weight, box_type, status)
 VALUES
-    (250, 'BASIC'),
+    (250, 'BASIC')
     (250, 'BASIC'),
     (250, 'BASIC'),
     (250, 'BASIC'),
