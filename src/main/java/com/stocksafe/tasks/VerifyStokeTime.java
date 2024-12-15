@@ -12,7 +12,6 @@ public class VerifyStokeTime {
 
     private final BusinessService businessService;
 
-
     @Scheduled(cron = "0 0 0 * * ?",zone = "America/Sao_Paulo")
     public void verifyBoxesExpiredDate() {
 
