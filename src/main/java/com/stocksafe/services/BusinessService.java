@@ -1,6 +1,10 @@
 package com.stocksafe.services;
 
+import com.stocksafe.dto.BoxDTO;
+import com.stocksafe.dto.ClientDTO;
 import com.stocksafe.dto.ItemDTO;
+import com.stocksafe.mapper.BoxMapper;
+import com.stocksafe.mapper.ClientMapper;
 import com.stocksafe.mapper.ItemMapper;
 import com.stocksafe.model.Box;
 import com.stocksafe.model.Client;
@@ -12,6 +16,8 @@ import com.stocksafe.repositories.ClientRepository;
 import com.stocksafe.repositories.ItemRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,14 +36,24 @@ public class BusinessService {
     private final BoxRepository boxRepository;
     private final ItemRepository itemRepository;
     private final ItemMapper itemMapper;
+    private final ClientService clientService;
+    private final BoxService boxService;
+    private final BoxMapper boxMapper;
+    private final ClientMapper clientMapper;
 
     @Transactional
+    @Caching(
+            put = {@CachePut(value = "boxes", key = "#box.id"), @CachePut(value = "clients", key = "#client.id")}
+    )
     public Client assignItemsToClientAndBox(Long clientId, Long boxId, List<ItemDTO> itemDTOs) {
-        Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new RuntimeException("Client not found"));
 
-        Box box = boxRepository.findById(boxId)
-                .orElseThrow(() -> new RuntimeException("Box not found"));
+        ClientDTO clientDTO = clientService.buscar(clientId);
+
+        BoxDTO boxDTO = boxService.buscar(boxId);
+
+        Box box = boxMapper.toModel(boxDTO);
+        Client client = clientMapper.toModel(clientDTO);
+
 
         if (box.getClient() != null) {
             throw new RuntimeException("Box is already occupied by another client");

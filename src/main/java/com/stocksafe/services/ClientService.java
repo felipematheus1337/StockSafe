@@ -7,6 +7,7 @@ import com.stocksafe.model.Client;
 import com.stocksafe.repositories.ClientRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class ClientService {
 
     }
 
+    @Cacheable(value = "clients", key = "#id")
     public ClientDTO buscar(Long id) {
 
         Optional<Client> optClient = this.clientRepository.findById(id);
