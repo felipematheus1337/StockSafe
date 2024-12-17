@@ -2,9 +2,7 @@ package com.stocksafe.mapper;
 
 
 import com.stocksafe.dto.BoxDTO;
-import com.stocksafe.dto.ClientDTO;
 import com.stocksafe.model.Box;
-import com.stocksafe.model.Client;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Configuration;
